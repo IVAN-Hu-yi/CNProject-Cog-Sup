@@ -69,7 +69,6 @@ I_CaT = n_t_zeros; m_CaT = n_t_zeros; h_CaT = n_t_zeros;
 I_H = n_t_zeros; m_H = n_t_zeros; h_H = n_t_zeros;
 I_Ks = n_t_zeros; m_Ks = n_t_zeros; h_Ks = n_t_zeros;
 I_Vivo = n_t_zeros;
-Ca = n_t_zeros;
 
 % Initial conditions ----------
 
@@ -87,7 +86,6 @@ Ca(1) = Ca_0 - tau_Ca * Geometric_Factor * (I_CaL(1) + I_CaT(1));
 % --- Plasticity variable initialization ---
 w = zeros(1, n_t);     % intrinsic excitability weight
 w(1) = 1;            % initial value
-Ca_in = zeros(1, n_t); % intracellular calcium concentration
 
 % Plasticity parameters
 eta_w = 1e-4;          % learning rate (ms^-1)
@@ -96,6 +94,7 @@ w_min = 1;           % lower bound
 w_max = 5;           % upper bound
 m_H(1) = 1 ./ ( 1 + exp( ( V(1) - V_Tau_Peak ) / k_Tau ) );
 x_CAN(1) = a_CAN * Ca_0 / (a_CAN * Ca_0 + b_CAN);
+%x_CAN(1) = 1;
 x_AHP(1) = a_AHP * Ca_0 / (a_AHP * Ca_0 + b_AHP);
 m_Ks(1) = 1 ./ ( 1 + exp ( - ( V(1)+44 ) / 5 ) );
 h_Ks(1) = 1 ./ ( 1 + exp ( ( V(1)+74 ) / 9.3 ) );
@@ -130,19 +129,7 @@ for k_t = 2:n_t
     tau_Ca_L = 10^(0.6 - 0.02 * V(k_t-1) );
     m_CaL(k_t) = m_CaL(k_t-1) + dt * ( m_CaL_inf - m_CaL(k_t-1) ) / tau_Ca_L;
     I_CaL(k_t) = g_CaL * m_CaL(k_t-1)^2 * ( V(k_t-1) - V_CaL );
-    % Constants
-    F = 96485;                    % Faraday constant [C/mol]
-    z_Ca = 2;                     % Charge of Ca2+
-    eta = 1e7;                    % Unit conversion factor
-    V_shell = 1e-15;              % Volume in m^3 (example: 1 µm^3 = 1e-18 m^3)
-    tau_Ca = 100e-3;              % Ca decay time constant [s]
-    Ca_rest = 0.05e-6;            % Resting [Ca2+] in M
 
-    % Update intracellular calcium
-    I_Ca = I_CaL(k_t);            % from your equation
-    % dCa = - (eta * I_Ca) / (z_Ca * F * V_shell); 
-    dCa = Geometric_Factor * I_Ca;
-    Ca_in(k_t) = Ca_in(k_t-1) + dt * (dCa - (Ca_in(k_t-1) - Ca_rest) / tau_Ca);
 
     % ICaT ----------
 
@@ -162,18 +149,20 @@ for k_t = 2:n_t
     I_H(k_t) = g_H * m_H(k_t-1) * ( V(k_t-1) - V_H );
 
     % [Ca] ----------
+    tau_Ca = 50;
+    %Ca(k_t) = Ca(k_t-1) + dt * ( - (Ca(k_t-1) - Ca_0) / tau_Ca );
 
     Ca(k_t) = Ca(k_t-1) + dt * ( - Geometric_Factor * (I_CaL(k_t-1) + I_CaT(k_t-1)) - ( Ca(k_t-1) - Ca_0 ) / tau_Ca );
 
     % ICAN ----------
 
     % --- w(t) update: intrinsic plasticity ---
-    dw = eta_w * (Ca_in(k_t-1) - theta_Ca); % anti-homeostatic rule
+    dw = eta_w * (Ca(k_t-1) - theta_Ca); % anti-homeostatic rule
     w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
 
     % --- ICAN current using effective conductance ---
-    x_CAN_inf = a_CAN * Ca_in(k_t-1) / ( a_CAN * Ca_in(k_t-1) + b_CAN );
-    tau_x_CAN = 1 / ( a_CAN * Ca_in(k_t-1) + b_CAN );
+    x_CAN_inf = a_CAN * Ca(k_t-1) / ( a_CAN * Ca(k_t-1) + b_CAN );
+    tau_x_CAN = 1 / ( a_CAN * Ca(k_t-1) + b_CAN );
     x_CAN(k_t) = x_CAN(k_t-1) + dt * ( x_CAN_inf - x_CAN(k_t-1) ) / tau_x_CAN;
 
     g_CAN_eff = w(k_t-1) * g_CAN;
@@ -233,17 +222,17 @@ I_Total_COLOR  = [0.30, 0.30, 0.30];% Dark Gray
 LineWidthThin = 1; LineWidth = 3;
 FontSize = 16;
 figure(1); clf; set(gcf,'color','white');
-nL = 5; nC = 1;
+nL = 4; nC = 1;
 if (g_Na == 0 && g_K==0 && g_CaL==0 && g_AHP==0 && g_CAN==0 && g_CaT==0 && g_H==0 && g_Ks==0); nL = 4; end
 nSubplot = 0;
 I_max = 2;
 
-nSubplot = nSubplot + 1;
-ax_I_Inj = subplot(nL,nC,nSubplot); hold on; box on; set(gca,'FontSize',FontSize)
-plot(T,I_Vitro,'Color',I_Input_COLOR,'DisplayName','I Inj','LineWidth',LineWidth)
-plot(T,I_Vitro+I_Vivo,'Color',I_Input_COLOR,'DisplayName','I Inj','LineWidth',LineWidthThin)
-xlabel('time (ms)'); ylabel('input current (µAcm^{-2}')
-axis([0 t_max -I_max I_max])
+% nSubplot = nSubplot + 1;
+% ax_I_Inj = subplot(nL,nC,nSubplot); hold on; box on; set(gca,'FontSize',FontSize)
+% plot(T,I_Vitro,'Color',I_Input_COLOR,'DisplayName','I Inj','LineWidth',LineWidth)
+% plot(T,I_Vitro+I_Vivo,'Color',I_Input_COLOR,'DisplayName','I Inj','LineWidth',LineWidthThin)
+% xlabel('time (ms)'); ylabel('input current (µAcm^{-2}')
+% axis([0 t_max -I_max I_max])
 % 
 % nSubplot = nSubplot + 1;
 % ax_V = subplot(nL,nC,nSubplot); hold on; box on; set(gca,'FontSize',FontSize)
@@ -253,7 +242,7 @@ axis([0 t_max -I_max I_max])
 % 
 nSubplot = nSubplot + 1;
 ax_Ca = subplot(nL,nC,nSubplot); hold on; box on; set(gca,'FontSize',FontSize)
-plot(T,Ca_in,'Color',Ca_COLOR,'LineWidth',LineWidth)
+plot(T,Ca,'Color',Ca_COLOR,'LineWidth',LineWidth)
 xlabel('time (ms)'); ylabel('Ca (µM)')
 axis([0 t_max 0 10])
 % 
