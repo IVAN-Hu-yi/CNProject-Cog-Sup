@@ -156,9 +156,19 @@ for k_t = 2:n_t
 
     % ICAN ----------
 
-    % --- w(t) update: intrinsic plasticity ---
-    dw = eta_w * (Ca(k_t-1) - theta_Ca); % anti-homeostatic rule
+   % --- w(t) update: intrinsic plasticity ---
+    % -- original - linear FR increase between phasic inputs --
+    %dw = eta_w * (Ca(k_t-1) - theta_Ca); % anti-homeostatic rule
+    %w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
+
+    % -- conditional - clamps weight change between phasic inputs for
+    % constant step increases
+    if I_Vitro(k_t-1) > 0
+    dw = eta_w * (Ca(k_t-1) - theta_Ca);
     w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
+     else
+    w(k_t) = w(k_t-1);
+    end
 
     % --- ICAN current using effective conductance ---
     x_CAN_inf = a_CAN * Ca(k_t-1) / ( a_CAN * Ca(k_t-1) + b_CAN );
