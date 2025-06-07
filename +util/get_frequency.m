@@ -12,7 +12,7 @@ function frequency = get_frequency(V, V_th, window, mode, dt)
 %     - if mode='inst', [Nx1] vector with instantaneous rates at spike times (NaN elsewhere)
 
 % 1) detect suprathreshold events
-N = numel(V)
+N = numel(V);
 spikes = V > V_th;                
 
 switch lower(mode)

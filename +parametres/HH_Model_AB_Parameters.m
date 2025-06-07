@@ -74,7 +74,7 @@ V_Ks = -85; % mV
 % [Ca2+]intra --------
 
 Ca_0 = 1e-1; % µM
-tau_Ca = 50; % ms
+tau_Ca = 200; % ms
 F = 96500; % mol / (s.A)
 r0 = 4e-4; % cm (1 µm = 10-4 cm)
 r1 = 0.25e-4; % cm (1 µm = 10-4 cm)

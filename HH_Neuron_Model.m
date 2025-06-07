@@ -99,6 +99,13 @@ x_AHP(1) = a_AHP * Ca_0 / (a_AHP * Ca_0 + b_AHP);
 m_Ks(1) = 1 ./ ( 1 + exp ( - ( V(1)+44 ) / 5 ) );
 h_Ks(1) = 1 ./ ( 1 + exp ( ( V(1)+74 ) / 9.3 ) );
 I_Ks(1) = g_Ks.*m_Ks(1).*h_Ks(1).*(V(1)-V_Ks);
+Ca_int = zeros(1, n_t); 
+Ca_int(1) = Ca(1); % integrated [Ca] for weight update
+tau_w = 5000; % ms
+theta_pot = 0.4;
+theta_depot = 0.1; % threshold for depotentiation (µM)
+eta_up = 1e-4; % potentiation rate (ms^-1)
+eta_down = 1e-4; % depotentiation rate (ms^-1)
 
 % Simulation ----------
 
@@ -163,12 +170,27 @@ for k_t = 2:n_t
 
     % -- conditional - clamps weight change between phasic inputs for
     % constant step increases
-    if I_Vitro(k_t-1) > 0
-    dw = eta_w * (Ca(k_t-1) - theta_Ca);
+    % if I_Vitro(k_t-1) > 0
+    % dw = eta_w * (Ca(k_t-1) - theta_Ca);
+    % w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
+    %  else
+    % w(k_t) = w(k_t-1);
+    % end
+
+    dw = eta_w * max((Ca(k_t-1) - theta_Ca)); % only potentiates when Ca2+ is above threshold
     w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
-     else
-    w(k_t) = w(k_t-1);
-    end
+    
+   
+  % Ca_int(k_t) = Ca_int(k_t-1) + dt * (- Geometric_Factor * I_CaL(k_t-1) - (Ca(k_t-1) - Ca_int(k_t-1)) / tau_w); % integrate [Ca] for weight update
+  %   if Ca_int(k_t) > theta_pot
+  %       dw = eta_up * (Ca_int(k_t) - theta_pot);
+  %   elseif Ca_int(k_t) < theta_depot
+  %       dw = -eta_down * (theta_depot - Ca_int(k_t));
+  %   else
+  %       dw = 0;
+  %   end
+    
+    w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
 
     % --- ICAN current using effective conductance ---
     x_CAN_inf = a_CAN * Ca(k_t-1) / ( a_CAN * Ca(k_t-1) + b_CAN );
@@ -184,7 +206,8 @@ for k_t = 2:n_t
     x_AHP_inf = a_AHP * Ca(k_t-1) / ( a_AHP * Ca(k_t-1) + b_AHP );
     tau_x_AHP = 1 / ( a_AHP * Ca(k_t-1) + b_AHP );
     x_AHP(k_t) = x_AHP(k_t-1) + dt * ( x_AHP_inf - x_AHP(k_t-1) ) / tau_x_AHP;
-    I_AHP(k_t) = g_AHP * x_AHP(k_t-1)^2 * ( V(k_t-1) - V_AHP );
+    g_AHP_eff = w(k_t-1) * g_AHP; % effective conductance for AHP current
+    I_AHP(k_t) = g_AHP_eff * x_AHP(k_t-1)^2 * ( V(k_t-1) - V_AHP );
 
     % IKs ----------
 
