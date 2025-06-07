@@ -7,6 +7,8 @@ function plot_effective_conductances(T, g_eff_struct, color_struct, LineWidth, F
     nL = ceil(nCurrents / nC);
     nSubplot = 0;
 
+    figure('Position', [100, 100, 1000, 800]);
+    hold on; box on; set(gca, 'FontSize', FontSize);
     for i = 1:nCurrents
         nSubplot = nSubplot + 1;
         ax = subplot(nL, nC, nSubplot); 
@@ -17,7 +19,7 @@ function plot_effective_conductances(T, g_eff_struct, color_struct, LineWidth, F
         g_trace = g_eff_struct.(curr_name);   % e.g., g_eff_Na
 
         % Extract matching color
-        color_key = ['I_' strrep(curr_name, 'g_eff_', '') '_COLOR'];
+        color_key = currents{i};
         if isfield(color_struct, color_key)
             trace_color = color_struct.(color_key);
         else
@@ -35,5 +37,6 @@ function plot_effective_conductances(T, g_eff_struct, color_struct, LineWidth, F
       end
       axis([0 t_max 0 1.1 * max_val]);
     end
+    hold off;
 end
 

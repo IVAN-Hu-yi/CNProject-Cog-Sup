@@ -22,3 +22,22 @@ theta_Ca = 0.2;        % Ca2+ threshold for potentiation (µM)
 w_min = 1;             % lower bound
 w_max = 5;             % upper bound
 w_neg_min = - 1;       % lower bound for negative w
+
+
+% plot parameters
+LineWidth = 1.5; % line width for plots
+FontSize = 12; % font size for plots
+% conductances
+g_eff_structs = [];
+
+colors = struct( ...
+    'CAN', [0.9, 0.6, 0.0], ...       % Gold/Amber
+    'K',   [0.0, 0.6, 0.5], ...       % Teal
+    'Na',  [0.8, 0.47, 0.65], ...     % Pink/Purple
+    'CaL', [0.95, 0.9, 0.25], ...     % Light Yellow
+    'CaT', [0.35, 0.7, 0.9], ...      % Sky Blue
+    'AHP', [0.0, 0.2, 0.5], ...       % Navy
+    'H',   [0.8, 0.4, 0.0], ...       % Rust/Orange Brown
+    'Ks',  [0.8, 0.8, 0.8], ...       % Light Gray
+    'L',   [0.2, 0.2, 0.2] ...        % Dark Gray (for leak)
+);

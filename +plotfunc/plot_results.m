@@ -8,7 +8,7 @@ freq_COLOR = [0.80, 0.47, 0.65]; % Purple
 
 % Create figure
 figure('Position', [100, 100, 1000, 800]);
-
+hold on;
 % Plot membrane potential
 subplot(5,1,1);
 plot(all_results.T, all_results.V, 'Color', V_COLOR, 'LineWidth', 2);
@@ -63,4 +63,6 @@ for i = 1:n_pulses
         ylim(yl);
     end
   end
+hold off;
 end
+
