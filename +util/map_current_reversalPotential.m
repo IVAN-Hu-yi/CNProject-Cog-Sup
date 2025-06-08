@@ -1,6 +1,6 @@
 function E_ion = map_current_reversalPotential(current)
 
-    parametres.HH_Model_AB_Parameters;
+    parametres.HH_Model_AB;
     % Make the struct map
     V_map = struct( ...
         'Na', V_Na, ...

@@ -1,4 +1,4 @@
-function plot_effective_conductances(T, g_eff_struct, color_struct, LineWidth, FontSize, t_max)
+function fig = plot_effective_conductances(T, g_eff_struct, color_struct, LineWidth, FontSize, t_max, titles)
     currents = fieldnames(g_eff_struct);  % {'g_eff_Na', ..., 'g_eff_H'}
     nCurrents = length(currents);
 
@@ -7,7 +7,7 @@ function plot_effective_conductances(T, g_eff_struct, color_struct, LineWidth, F
     nL = ceil(nCurrents / nC);
     nSubplot = 0;
 
-    figure('Position', [100, 100, 1000, 800]);
+    fig = figure('Position', [100, 100, 1000, 800]);
     hold on; box on; set(gca, 'FontSize', FontSize);
     for i = 1:nCurrents
         nSubplot = nSubplot + 1;

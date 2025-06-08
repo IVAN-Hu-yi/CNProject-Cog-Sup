@@ -1,6 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1749220990.30002 "/Users/yingcai/M1/S2/CN/CNProject/equations/equations.tex" "equations.pdf" "equations" 1749220990.86709 0
-  "/Users/yingcai/M1/S2/CN/CNProject/equations/equations.tex" 1749220990.03948 5152 27d3d87ded086a2591982cc8794f8fce ""
+["pdflatex"] 1749487292.25527 "equations.tex" "equations.pdf" "equations" 1749487292.87006 0
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/map/fontname/texfonts.map" 1741388039 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/map/pdftex/updmap/pdftex.map" 1741388039 5466553 2748998d7db8078826afa1f272036265 ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1741388039 1120 1e8878807317373affa7f7bba4cf2f6a ""
@@ -48,6 +47,8 @@
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1741388039 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1741388039 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1741388039 32716 08e384dc442464e7285e891af9f45947 ""
+  "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb" 1741388039 34694 ad62b13721ee8eda1dcc8993c8bd7041 ""
+  "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm7.pfb" 1741388039 35309 940e81a5b9e04201a07e8b33a3ae6e64 ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty" 1741388039 5949 3f3fd50a8cc94c3d4cbf4fc66cd3df1c ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsfonts/amssymb.sty" 1741388039 13829 94730e64147574077f8ecfea9bb69af4 ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsfonts/umsa.fd" 1741388039 961 6518c6525a34feb5e8250ffa91731cff ""
@@ -63,8 +64,8 @@
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/tools/bm.sty" 1741388039 13236 1aba485b47e3c79a47dc0906cc971820 ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-dist/web2c/texmf.cnf" 1742824805.62908 42151 79f67285bdd95beca4d137b380b4b9e5 ""
   "/usr/local/Cellar/texlive/20250308_1/share/texmf-var/web2c/pdftex/pdflatex.fmt" 1741388039 3346056 98361fcfb0fa8e58b0f49f951079fd02 ""
-  "equations.aux" 1749220990.79635 249 d172ee8cc17363a96e7543e91b7d971e "pdflatex"
-  "equations.tex" 1749220990.03948 5152 27d3d87ded086a2591982cc8794f8fce ""
+  "equations.aux" 1749487292.78141 249 e19b79542d7f1c5624c68db433f63c52 "pdflatex"
+  "equations.tex" 1749487291.97034 6232 f60229c722095fb4ae28255002453943 ""
   (generated)
   "equations.aux"
   "equations.log"

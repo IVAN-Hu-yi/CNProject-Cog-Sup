@@ -4,7 +4,7 @@ function frequency = get_frequency(V, V_th, window, mode, dt)
 %   V_th    : scalar detection threshold (mV)
 %   window  : sliding window size in samples (for 'mean' mode)
 %   mode    : 'mean' or 'inst' (instantaneous: using ISIs i.e., 1/ISI)
-%   dt      : duration of a single time step (in seconds)
+%   dt      : duration of a single time step (in ms)
 %
 % OUTPUT:
 %   frequency : 
@@ -14,6 +14,7 @@ function frequency = get_frequency(V, V_th, window, mode, dt)
 % 1) detect suprathreshold events
 N = numel(V);
 spikes = V > V_th;                
+dt = dt / 1000;  % convert dt from ms to seconds
 
 switch lower(mode)
     

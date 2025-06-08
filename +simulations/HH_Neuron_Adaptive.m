@@ -1,12 +1,11 @@
-function [final_states, all_results] = HH_Neuron_Iterative(types, n_pulses, saveVarArg, currentVarArg)
+function [final_states, all_results] = HH_Neuron_Adaptive(types, n_pulses, saveVarArg, currentVarArg)
 % HH_Neuron_Iterative - Simulates the multistable neuron model iteratively
 %   for each phasic input, using final states from one simulation as initial
 %   conditions for the next.
 
-parametres.ParametresInit_Clamping; 
+parametres.ParametresInit_Adaptive; 
 % Initialize storage for final states and all results
 parametres.init;
-
 final_states = repmat(initial_state, 1, n_pulses);
 % Run simulations for each pulse
 for pulse_num = 1:n_pulses
@@ -16,14 +15,14 @@ for pulse_num = 1:n_pulses
     % create time vector and input current for this segment
     [T_segment, I_Vitro_segment] = util.create_protocol(...
         pulse_num, n_pulses, pre_time, pulse_duration, gap_duration, post_time, dt, I_PHASIC, type);
-    
+
     % Run simulation for this segment
-    results = util.simulate_segment_iterative(T_segment, I_Vitro_segment, initial_state, ...
+    results = util.simulate_segment_adaptive(T_segment, I_Vitro_segment, initial_state, ...
         dt, C, g_L, V_L, g_Na, V_Na, g_K, V_K, g_CaL, V_CaL, g_AHP, V_AHP, ...
         a_AHP, b_AHP, g_CaT, V_CaT, g_H, V_H, V_Tau_Peak, k_Tau, tau_min, ...
         tau_diff, g_CAN, V_CAN, a_CAN, b_CAN, g_Ks, V_Ks, tau_m_Ks, ...
         Ca_0, tau_Ca, Geometric_Factor, eta_w, theta_Ca, w_min, w_max, ...
-        sigma_Noise, Tau_m, Diff_Coeff, w_neg_min, eta_w_neg);
+        sigma_Noise, Tau_m, Diff_Coeff, w_neg_min, eta_w_neg, hill_n, K_hill);
     
     % Store results
     all_results = util.store_results(all_results, results, saveVarArg);

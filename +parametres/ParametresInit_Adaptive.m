@@ -1,5 +1,5 @@
 % Load parameters
-parametres.HH_Model_AB_Parameters;
+parametres.HH_Model_AB_Adaptive;
 experiment = 'in vitro';
 if strcmp(experiment,'in vitro'); sigma_Noise = 0; end
 if strcmp(experiment,'in vivo'); sigma_Noise = 2.5; end
@@ -19,9 +19,11 @@ post_time = 2000;         % ms after last pulse
 eta_w = 1e-4;          % learning rate (ms^-1)
 eta_w_neg = 1e-4;     % learning rate for negative w (ms^-1)
 theta_Ca = 0.2;        % Ca2+ threshold for potentiation (µM)
-w_min = 1;             % lower bound
+w_min = 0.1;             % lower bound
 w_max = 5;             % upper bound
 w_neg_min = - 1;       % lower bound for negative w
+hill_n = 1.7;          % for Hill function in adaptive mechanism
+K_hill = 40;          % half-maximal concentration for Hill function
 
 
 % plot parameters

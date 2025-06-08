@@ -1,8 +1,8 @@
-function results = simulate_segment(T, I_Vitro, initial_state, dt, C, g_L, V_L, ...
+function results = simulate_segment_adaptive(T, I_Vitro, initial_state, dt, C, g_L, V_L, ...
     g_Na, V_Na, g_K, V_K, g_CaL, V_CaL, g_AHP, V_AHP, a_AHP, b_AHP, ...
     g_CaT, V_CaT, g_H, V_H, V_Tau_Peak, k_Tau, tau_min, tau_diff, ...
     g_CAN, V_CAN, a_CAN, b_CAN, g_Ks, V_Ks, tau_m_Ks, Ca_0, tau_Ca, ...
-    Geometric_Factor, eta_w, theta_Ca, w_min, w_max, sigma_Noise, Tau_m, Diff_Coeff, w_neg_min, eta_w_neg)
+    Geometric_Factor, eta_w, theta_Ca, w_min, w_max, sigma_Noise, Tau_m, Diff_Coeff, w_neg_min, eta_w_neg, hill_n, K_hill)
 
 n_t = length(T);
 
@@ -101,28 +101,30 @@ for k_t = 2:n_t
     
     % ICAN - with plasticity
     % Update w only during phasic stimulation
-    if I_Vitro(k_t-1) > 0
-        dw = eta_w * (Ca(k_t-1) - theta_Ca);
-        w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
-    elseif I_Vitro(k_t-1) < 0
-        dw = eta_w_neg * (Ca(k_t-1) - theta_Ca);
-        % fprintf('dw: %f\n', max(w(k_t-1) - dt * dw, w_neg_min));
-        w(k_t) = w(k_t-1) - dt * dw;
-    else
-        w(k_t) = w(k_t-1);
-    end
+    % if I_Vitro(k_t-1) > 0
+    %     dw = eta_w * (Ca(k_t-1) - theta_Ca);
+    %     w(k_t) = min(max(w(k_t-1) + dt * dw, w_min), w_max);
+    % elseif I_Vitro(k_t-1) < 0
+    %     dw = eta_w_neg * (Ca(k_t-1) - theta_Ca);
+    %     % fprintf('dw: %f\n', max(w(k_t-1) - dt * dw, w_neg_min));
+    %     w(k_t) = w(k_t-1) - dt * dw;
+    % else
+    %     w(k_t) = w(k_t-1);
+    % end
+    %
+    w(k_t) = Ca(k_t)^hill_n/(Ca(k_t)^hill_n + K_hill^hill_n);
     
     x_CAN_inf = a_CAN * Ca(k_t-1) / ( a_CAN * Ca(k_t-1) + b_CAN );
     tau_x_CAN = 1 / ( a_CAN * Ca(k_t-1) + b_CAN );
     x_CAN(k_t) = x_CAN(k_t-1) + dt * ( x_CAN_inf - x_CAN(k_t-1) ) / tau_x_CAN;
     g_CAN_eff = w(k_t-1) * g_CAN;
-    I_CAN(k_t) = g_CAN_eff * x_CAN(k_t-1) * ( V(k_t-1) - V_CAN );
+    I_CAN(k_t) = g_CAN_eff * x_CAN(k_t)  * ( V(k_t-1) - V_CAN );
     
     % IAHP
     x_AHP_inf = a_AHP * Ca(k_t-1) / ( a_AHP * Ca(k_t-1) + b_AHP );
     tau_x_AHP = 1 / ( a_AHP * Ca(k_t-1) + b_AHP );
     x_AHP(k_t) = x_AHP(k_t-1) + dt * ( x_AHP_inf - x_AHP(k_t-1) ) / tau_x_AHP;
-    I_AHP(k_t) = g_AHP * x_AHP(k_t-1)^2 * ( V(k_t-1) - V_AHP );
+    I_AHP(k_t) = g_AHP * x_CAN(k_t)  * ( V(k_t-1) - V_AHP );
     
     % IKs
     m_Ks_inf = 1 ./ ( 1 + exp ( - ( V(k_t-1)+44 ) / 5 ) );

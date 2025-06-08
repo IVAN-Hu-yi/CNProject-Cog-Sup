@@ -40,14 +40,14 @@ V_CaL = 150; % mV
 
 % I AHP --------
 
-g_AHP = 0; % mS.cm-2
+g_AHP = 0.015; % mS.cm-2
 V_AHP = -90; % mV
 a_AHP = 0.05; % ms-1.µM-1
 b_AHP = 0.2; % ms-1
 
 % I CaT --------
 
-g_CaT = 0; % mScm-2
+g_CaT = 0.5; % mScm-2
 V_CaT = 120; % mV
 
 % I H --------
@@ -66,15 +66,15 @@ b_CAN = 0.0125; % ms-1
 
 % I Ks --------
 
-g_Ks = 0; % mS.cm-2
-tau_m_Ks_mean = 50; % ms
-tau_m_Ks = 50; % ms
+g_Ks = 0.025; % mS.cm-2
+tau_m_Ks_mean = 55; % ms
+tau_m_Ks = 55; % ms
 V_Ks = -85; % mV
 
 % [Ca2+]intra --------
 
 Ca_0 = 1e-1; % µM
-tau_Ca = 200; % ms
+tau_Ca = 1600; % ms
 F = 96500; % mol / (s.A)
 r0 = 4e-4; % cm (1 µm = 10-4 cm)
 r1 = 0.25e-4; % cm (1 µm = 10-4 cm)

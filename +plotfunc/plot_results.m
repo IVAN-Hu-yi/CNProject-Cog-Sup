@@ -1,4 +1,4 @@
-function plot_results(all_results, n_pulses, pulse_duration, gap_duration, pre_time, post_time)
+function fig = plot_results(all_results, n_pulses, pulse_duration, gap_duration, pre_time, post_time, titles)
 
 % Set up colors
 V_COLOR = [0.86, 0.37, 0.34]; % Red-Orange
@@ -7,7 +7,8 @@ w_COLOR = [0.00, 0.62, 0.45]; % Green
 freq_COLOR = [0.80, 0.47, 0.65]; % Purple
 
 % Create figure
-figure('Position', [100, 100, 1000, 800]);
+fig = figure('Position', [100, 100, 1000, 800]);
+sgtitle(titles, 'FontSize', 16, 'FontWeight', 'bold');
 hold on;
 % Plot membrane potential
 subplot(5,1,1);

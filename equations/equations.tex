@@ -10,12 +10,25 @@
 \date{}
 \maketitle
 
-\section{Membrane Potential Dynamics}
+\section{Hodgkin-Huxley Neuron Model}
 The voltage dynamics for a single-compartment neuron is described by:
-\begin{align*}
-C_m \frac{dV}{dt} = -\left( I_\mathrm{L} + I_\mathrm{Na} + I_\mathrm{K} + I_\mathrm{CaL} + I_\mathrm{CAN} + I_\mathrm{AHP} + I_\mathrm{CaT} + I_\mathrm{H} + I_\mathrm{Ks} \right) + I_\mathrm{ext} + I_\mathrm{noise} 
-\end{align*}
-where $C_m$ is the membrane capacitance, $I_\mathrm{ext}$ is external current, and $I_\mathrm{noise}$ is noise current.
+\begin{align}
+  C_m \frac{dV}{dt} = - I_\mathrm{L} - \sum_{x \in \mathbb{X}} I_x  + I_\mathrm{ext} + I_\mathrm{noise} 
+\end{align}
+
+\noindent where $C_m$ is the membrane capacitance, $I_\mathrm{ext}$ is external current, and $I_\mathrm{noise}$ is noise current. Here $I_x$ is the ionic current for each ion channel type $x$ in the set $\mathbb{X}$, which includes sodium (Na), potassium (K), L-type and T-type calcium (CaL, CaT), hyperpolarization-activated (H), slow potassium (Ks), afterhyperpolarization (AHP), and calcium-activated non-specific (CAN) channels (i.e., $\mathbb{X} = \{Na, K, CaL, CaT, H, Ks, AHP, CAN\}$). Each ionic current follows Ohm's with activation and inactivation dynamics:
+
+\begin{align}
+  I_x = g_x m^a h^b  (V - V_x)
+\end{align}
+\noindent where $g_x$ is the maximal conductances for ion type $x$, $m$ and $h$ are activation and inactivation gating variables, respectively, and $V_x$ is the reversal potential for ion type $x$. The parameters $a$ and $b$ depend on the specific channel type describing the on/off kinetics of the channel provided in the table. All gating variables evolve according to first-order kinetics:
+
+\begin{align}
+  \tau_m \frac{dx}{dt} = (m_\infty - m)
+\end{align}
+
+\noindent Here the steady-state value $m_\infty$ is a function of the membrane potential $V$, and $\tau_m$ is the voltage-dependent time constant for the gating variable $m$. The same applies to inactivation variables $h$.
+
 \section{Ionic Currents}
 
 Belows are equations for various ionic currents in the neuron model:
