@@ -124,7 +124,7 @@ for k_t = 2:n_t
     x_AHP_inf = a_AHP * Ca(k_t-1) / ( a_AHP * Ca(k_t-1) + b_AHP );
     tau_x_AHP = 1 / ( a_AHP * Ca(k_t-1) + b_AHP );
     x_AHP(k_t) = x_AHP(k_t-1) + dt * ( x_AHP_inf - x_AHP(k_t-1) ) / tau_x_AHP;
-    I_AHP(k_t) = g_AHP * x_CAN(k_t)  * ( V(k_t-1) - V_AHP );
+    I_AHP(k_t) = w(k_t-1) * g_AHP * x_CAN(k_t)  * ( V(k_t-1) - V_AHP );
     
     % IKs
     m_Ks_inf = 1 ./ ( 1 + exp ( - ( V(k_t-1)+44 ) / 5 ) );

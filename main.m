@@ -65,3 +65,6 @@ saveas(figure, fullfile([base_path, filenames_adaptive_conductances]));
 
 %% AB simulations
 simulations.HH_Neuron_Model;
+
+%% Reduced Model simulations
+MS_Model_2d;
