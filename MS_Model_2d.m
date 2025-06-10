@@ -8,8 +8,11 @@ warning('off')
 t0 = 0; tmax = 10; dt = 1e-3; % s
 T = (t0:dt:tmax)'; nT = length(T);
 
+% Plasticity mode ('anti' for Egorov-style, 'homeo' for depressive)
+plasticity_type = 'homeo';
+
 % Symbolic variables -----
-syms x1_ x2_
+syms x1_ x2_ input_
 vars_ = [x1_ x2_];
 
 % Model -----
@@ -20,49 +23,51 @@ par = []; par_ = [];
 x10 = 0.1; x20 = 0.01;
 xmin = 0; xmax = 60;
 
-% Model equations
-f1 = (-x1_ + 50/(1 + exp(-(x2_*x1_ - 5)/2)))/10;
-f2 = 0.02*x1_*(1 - x2_) - 0.01*x2_;
+% Plasticity rule
+if strcmp(plasticity_type, 'anti')
+    f2 = 0.02*x1_*(1 - x2_) - 0.01*x2_;
+elseif strcmp(plasticity_type, 'homeo')
+    f2 = -0.02*x1_*(1 - x2_) - 0.01*x2_;
+else
+    error('Unknown plasticity type');
+end
+
+% Model equations with external input term
+f1 = (-x1_ + 50/(1 + exp(-(x2_*x1_ - 5)/2)) + input_) / 10;
 dxdt_ = [f1; f2];
 
 % Display model
 disp(['*** ' Model_Name ' ***'])
-disp(['Function: dx1dt = ' char(simplify(dxdt_(1)))])
-disp(['Function: dx2dt = ' char(simplify(dxdt_(2)))]);
+disp(['Function: dx1dt = ' char(simplify(f1))])
+disp(['Function: dx2dt = ' char(simplify(f2))]);
 
-% Solve fixed points
-FP_ = solve(dxdt_ == 0, vars_);
-Jacobian_ = jacobian(dxdt_, vars_);
+% Solve fixed points (without input)
+FP_ = solve(subs(dxdt_, input_, 0) == 0, vars_);
+nFP = length(FP_.x1_);
+Jacobian_ = jacobian(subs(dxdt_, input_, 0), vars_);
 
 % Initialize solution arrays
 x1 = zeros(1,nT); x2 = zeros(1,nT);
 x1(1) = x10; x2(1) = x20;
 
-% Evaluate Jacobian, eigenvalues/vectors
-nFP = length(FP_.x1_);
-Stability = zeros(1,nFP);
-Nature = cell(1,nFP);
-for kFP = 1:nFP
-    J_FP_ = subs(Jacobian_, vars_, [FP_.x1_(kFP), FP_.x2_(kFP)]);
-    [eigvect, eigenval] = eig(J_FP_);
-    eigs = diag(eigenval);
-    if isreal(eigs)
-        if eigs(1)>0 && eigs(2)>0; Nature{kFP} = 'unstable node'; Stability(kFP) = 1; end
-        if sign(eigs(1)*eigs(2))<=0; Nature{kFP} = 'saddle node'; Stability(kFP) = 2; end
-        if eigs(1)<=0 && eigs(2)<=0; Nature{kFP} = 'stable node'; Stability(kFP) = 3; end
-    else
-        if real(eigs(1))>0; Nature{kFP} = 'unstable focus'; Stability(kFP) = 4; end
-        if real(eigs(1))==0; Nature{kFP} = 'center'; Stability(kFP) = 5; end
-        if real(eigs(1))<0; Nature{kFP} = 'stable focus'; Stability(kFP) = 6; end
-    end
-end
+% Phasic input protocol
+pulse_duration = 0.25; % s
+pulse_interval = 1.0;  % s
+pulse_times = 0.5:pulse_interval:(tmax - pulse_duration);
 
 % Numerical simulation
-f1_num = matlabFunction(f1, 'Vars', {x1_, x2_});
+f1_input = matlabFunction(f1, 'Vars', {x1_, x2_, input_});
 f2_num = matlabFunction(f2, 'Vars', {x1_, x2_});
-for kt = 1:nT-1
-    x1(kt+1) = x1(kt) + dt * f1_num(x1(kt), x2(kt));
-    x2(kt+1) = x2(kt) + dt * f2_num(x1(kt), x2(kt));
+for k_t = 1:nT-1
+    t_curr = T(k_t);
+    input = 0;
+    if any(t_curr >= pulse_times & t_curr < pulse_times + pulse_duration)
+        input = 5; % pulse amplitude
+    end
+    dx1 = f1_input(x1(k_t), x2(k_t), input);
+    dx2 = f2_num(x1(k_t), x2(k_t));
+    x1(k_t+1) = x1(k_t) + dt * dx1;
+    x2(k_t+1) = x2(k_t) + dt * dx2;
 end
 
 % Graphics settings
@@ -72,7 +77,7 @@ Color_Map = turbo(256);
 x_All = linspace(xmin, xmax, 100);
 y_All = linspace(0, 1, 100);
 [x1_Grad,x2_Grad] = meshgrid(x_All, y_All);
-dx1dt_Grad = f1_num(x1_Grad,x2_Grad);
+dx1dt_Grad = f1_input(x1_Grad, x2_Grad, 0);
 dx2dt_Grad = f2_num(x1_Grad,x2_Grad);
 dpdt_theta = angle(dx1dt_Grad + 1i*dx2dt_Grad);
 dpdt_theta_n = ceil((255)*(dpdt_theta + pi)/(2*pi)) + 1;
@@ -84,10 +89,10 @@ end
 
 % Phase Portrait with color-coded direction field
 figure(1); clf; set(gcf,'Color','white'); set(gca,'FontSize',FontSize)
-title(['Phase Portrait: ' Model_Name])
+title(['Phase Portrait: ' Model_Name ' (' plasticity_type ')'])
 image('XData',x_All,'YData',y_All,'CData',Field_Color,'CDataMapping','direct')
 set(gca,'YDir','normal'); hold on; box on;
-fimplicit(f1 == 0, [xmin xmax 0 1],'c','LineWidth',LineWidth);
+fimplicit(subs(f1, input_, 0) == 0, [xmin xmax 0 1],'c','LineWidth',LineWidth);
 fimplicit(f2 == 0, [xmin xmax 0 1],'g','LineWidth',LineWidth);
 plot(x1, x2, 'b', 'LineWidth', LineWidth);
 plot(x1(1), x2(1), 'bo', 'MarkerSize', IC_Size, 'MarkerFaceColor', 'b');
@@ -95,6 +100,17 @@ plot(x1(1), x2(1), 'bo', 'MarkerSize', IC_Size, 'MarkerFaceColor', 'b');
 % Fixed points
 FP.x1 = double(FP_.x1_); FP.x2 = double(FP_.x2_);
 for kFP = 1:nFP
+    J_FP_ = subs(Jacobian_, vars_, [FP.x1(kFP), FP.x2(kFP)]);
+    [~, D] = eig(double(J_FP_)); eigs = diag(D);
+    if isreal(eigs)
+        if eigs(1)>0 && eigs(2)>0; Stability(kFP) = 1; end
+        if sign(eigs(1)*eigs(2))<=0; Stability(kFP) = 2; end
+        if eigs(1)<=0 && eigs(2)<=0; Stability(kFP) = 3; end
+    else
+        if real(eigs(1))>0; Stability(kFP) = 4; end
+        if real(eigs(1))==0; Stability(kFP) = 5; end
+        if real(eigs(1))<0; Stability(kFP) = 6; end
+    end
     plot(FP.x1(kFP), FP.x2(kFP), 'ro', 'MarkerSize', FP_Size, 'LineWidth', LineWidth, 'MarkerFaceColor', FP_FaceColor(Stability(kFP)));
     plot(FP.x1(kFP), FP.x2(kFP), ['r' FP_Symbol(Stability(kFP))], 'LineWidth', LineWidth, 'MarkerSize', FP_Size);
 end
